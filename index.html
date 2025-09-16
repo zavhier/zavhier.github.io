@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Plan de Estudios - Visual</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+    }
+    .grid {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+    }
+    .year {
+      flex: 0 0 300px;
+    }
+    .year h2 {
+      text-align: center;
+      background: #2980b9;
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .cuatrimestre {
+      margin-top: 10px;
+      padding: 10px;
+      background: #ecf0f1;
+      border-radius: 5px;
+    }
+    .materia {
+      background: white;
+      border-left: 5px solid #27ae60;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .materia small {
+      display: block;
+      font-size: 0.8em;
+      color: #555;
+    }
+    .materia.highlight {
+      background: #d1f2eb;
+      border-color: #1abc9c;
+    }
+    .materia.upstream {
+      background: #fef9e7;
+      border-color: #f1c40f;
+    }
+  </style>
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      const materias = document.querySelectorAll('.materia[data-correlativa]');
+      const correlativas = {}; // key: id, value: correlativas que requiere
+      const inversas = {}; // key: id, value: materias que requieren a esta
+
+      materias.forEach(m => {
+        const id = m.id;
+        const deps = m.dataset.correlativa.split(',').map(x => x.trim());
+        correlativas[id] = deps;
+        deps.forEach(dep => {
+          if (!inversas[dep]) inversas[dep] = [];
+          inversas[dep].push(id);
+        });
+      });
+
+      materias.forEach(materia => {
+        materia.addEventListener('mouseenter', () => {
+          const id = materia.id;
+
+          // Pintar requisitos directos (correlativas) en verde
+          if (correlativas[id]) {
+            correlativas[id].forEach(cor => {
+              const target = document.getElementById(cor);
+              if (target) target.classList.add('highlight');
+            });
+          }
+
+          // Pintar requisitos de las correlativas en amarillo (indirectos)
+          if (correlativas[id]) {
+            correlativas[id].forEach(cor => {
+              if (correlativas[cor]) {
+                correlativas[cor].forEach(up => {
+                  const upstream = document.getElementById(up);
+                  if (upstream) upstream.classList.add('upstream');
+                });
+              }
+            });
+          }
+        });
+
+        materia.addEventListener('mouseleave', () => {
+          document.querySelectorAll('.materia').forEach(m => m.classList.remove('highlight', 'upstream'));
+        });
+      });
+    });
+  </script>
+</head>
+<body>
+  <h1>Plan de Estudios - Licenciatura en Gestión de Tecnologías de la Información</h1>
+  <div class="grid">
+    <div class="year">
+      <h2>1º Año</h2>
+      <div class="cuatrimestre">
+        <h3>1º Cuatrimestre</h3>
+        <div class="materia" id="6001">Análisis Matemático I<small>6001</small></div>
+        <div class="materia" id="6002">Arquitectura de Computadoras I<small>6002</small></div>
+        <div class="materia" id="6003">Introducción a la Programación<small>6003</small></div>
+        <div class="materia" id="6004">Estructuras Discretas<small>6004</small></div>
+        <div class="materia" id="6005">Ciencia, Tecnología y Sociedad<small>6005</small></div>
+      </div>
+      <div class="cuatrimestre">
+        <h3>2º Cuatrimestre</h3>
+        <div class="materia" id="6006" data-correlativa="6001">Análisis Matemático II<small>6006 - Requiere 6001</small></div>
+        <div class="materia" id="6007" data-correlativa="6001">Álgebra y Geometría Analítica<small>6007 - Requiere 6001</small></div>
+        <div class="materia" id="6008" data-correlativa="6003,6004">Algoritmos y Programación<small>6008 - Requiere 6003 y 6004</small></div>
+        <div class="materia" id="6009" data-correlativa="6002,6005">Arquitectura de Computadoras II<small>6009 - Requiere 6002 y 6005</small></div>
+        <div class="materia" id="6010" data-correlativa="6005">Inglés I<small>6010 - Requiere 6005</small></div>
+      </div>
+    </div>
+    <div class="year">
+      <h2>2º Año</h2>
+      <div class="cuatrimestre">
+        <h3>1º Cuatrimestre</h3>
+        <div class="materia" id="6011" data-correlativa="6002,6010">Sistemas Operativos I<small>6011 - Requiere 6002 y 6010</small></div>
+        <div class="materia" id="6012" data-correlativa="6001">Economía General<small>6012 - Requiere 6001</small></div>
+        <div class="materia" id="6013" data-correlativa="6010">Inglés II<small>6013 - Requiere 6010</small></div>
+        <div class="materia" id="6014" data-correlativa="6003,6004,6005">Ingeniería de Software I<small>6014 - Requiere 6003, 6004 y 6005</small></div>
+        <div class="materia" id="6015" data-correlativa="6003">Paradigmas de Programación<small>6015 - Requiere 6003</small></div>
+      </div>
+      <div class="cuatrimestre">
+        <h3>2º Cuatrimestre</h3>
+        <div class="materia" id="6016" data-correlativa="6011">Sistemas Operativos II<small>6016 - Requiere 6011</small></div>
+        <div class="materia" id="6017" data-correlativa="6015">Laboratorio de Programación y Lenguajes<small>6017 - Requiere 6015</small></div>
+        <div class="materia" id="6018" data-correlativa="6008">Programación Orientada a Objetos<small>6018 - Requiere 6008</small></div>
+        <div class="materia" id="6019" data-correlativa="6004,6007">Base de Datos I<small>6019 - Requiere 6004 y 6007</small></div>
+        <div class="materia" id="6020">Administración I<small>6020</small></div>
+      </div>
+    </div>
+    <div class="year">
+      <h2>3º Año</h2>
+      <div class="cuatrimestre">
+        <h3>1º Cuatrimestre</h3>
+        <div class="materia" id="6021" data-correlativa="6006,6007">Probabilidad y Estadísticas<small>6021 - Requiere 6006 y 6007</small></div>
+        <div class="materia" id="6022" data-correlativa="6004,6011">Comunicaciones y Redes<small>6022 - Requiere 6004 y 6011</small></div>
+        <div class="materia" id="6023" data-correlativa="6014">Ingeniería de Software II<small>6023 - Requiere 6014</small></div>
+        <div class="materia" id="6024" data-correlativa="6020">Administración II<small>6024 - Requiere 6020</small></div>
+      </div>
+      <div class="cuatrimestre">
+        <h3>2º Cuatrimestre</h3>
+        <div class="materia" id="6025" data-correlativa="6014,6018,6019">Laboratorio de Software<small>6025 - Requiere 6014, 6018 y 6019</small></div>
+        <div class="materia" id="6026" data-correlativa="6019">Base de Datos II<small>6026 - Requiere 6019</small></div>
+        <div class="materia" id="6027" data-correlativa="6020">Contabilidad I<small>6027 - Requiere 6020</small></div>
+        <div class="materia" id="6028" data-correlativa="6018,6022,6023">Trabajo de Campo<small>6028 - Requiere 6018, 6022 y 6023</small></div>
+      </div>
+    </div>
+    <div class="year">
+      <h2>4º Año</h2>
+      <div class="cuatrimestre">
+        <h3>1º Cuatrimestre</h3>
+        <div class="materia" id="6029" data-correlativa="6021">Investigación Operativa<small>6029 - Requiere 6021</small></div>
+        <div class="materia" id="6030" data-correlativa="6022">Arquitectura Web<small>6030 - Requiere 6022</small></div>
+        <div class="materia" id="6031" data-correlativa="6017,6018,6022,6023">Seguridad Informática<small>6031 - Requiere 6017, 6018, 6022 y 6023</small></div>
+        <div class="materia" id="6032" data-correlativa="6020,6024">Administración de Recursos Humanos<small>6032 - Requiere 6020 y 6024</small></div>
+        <div class="materia" id="6033" data-correlativa="6025">Contabilidad Avanzada<small>6033 - Requiere 6027</small></div>
+      </div>
+      <div class="cuatrimestre">
+        <h3>2º Cuatrimestre</h3>
+        <div class="materia" id="6034" data-correlativa="6021,6023">Sistemas Inteligentes<small>6034 - Requiere 6021 y 6023</small></div>
+        <div class="materia" id="6035" data-correlativa="6022,6023">Gestión de la Tecnología<small>6035 - Requiere 6022 y 6023</small></div>
+        <div class="materia" id="6036" data-correlativa="6020,6024">Comercialización<small>6036 - Requiere 6020 y 6024</small></div>
+        <div class="materia" id="6037" data-correlativa="6006,6012,6020,6027">Planificación Financiera y Proyecto de Inversión<small>6037 - Requiere 6006,6012,6020 y 6027</small></div>
+        <div class="materia" id="6038">Optativa I<small>6038</small></div>
+      </div>
+    </div>
+    <div class="year">
+      <h2>5º Año</h2>
+      <div class="cuatrimestre">
+        <h3>1º Cuatrimestre</h3>
+        <div class="materia" id="6039" data-correlativa="6012,6021,6023,6029">Gestión de Proyectos<small>6039 - Requiere 6012,6021,6023 y 6029</small></div>
+        <div class="materia" id="6040" data-correlativa="6023,6025,6026">Inteligencia de los Negocios<small>6040 - Requiere 6023,6025 y 6026</small></div>
+        <div class="materia" id="6041">Optativa II<small>6041</small></div>
+        <div class="materia" id="6042" data-correlativa="6036">Dirección Estratégica<small>6042 Requiere 6036</small></div>
+        <div class="materia" id="6043">Trabajo Final de Grado<small>6043</small></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+
+
+
+ 
+
+
